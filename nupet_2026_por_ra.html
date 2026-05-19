@@ -243,7 +243,7 @@ select:focus { border-color: var(--text); }
       <option value="cafe">Café na Faixa</option>
       <option value="resp">Coletivo Resp</option>
       <option value="circ">Circuito de Rua</option>
-      <option value="det">DETRAN</option>
+      <option value="det">DETRAN nos Parques</option>
       <option value="par">Parques</option>
       <option value="app">Entrega de APP</option>
       <option value="pal">Palestra em Inst</option>
@@ -318,6 +318,40 @@ select:focus { border-color: var(--text); }
     </div>
   </div>
 
+  <!-- ATIVIDADES REALIZADAS POR MÊS -->
+  <div class="chart-section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Atividades realizadas por mês</div>
+        <div class="section-desc">Cada atividade em colunas — Jan a Abr 2026</div>
+      </div>
+    </div>
+    <div style="position:relative;height:320px"><canvas id="atMesChart" role="img" aria-label="Atividades realizadas por mês e tipo"></canvas></div>
+    <div class="legend-grid" id="atmes-legend" style="margin-top:20px"></div>
+  </div>
+
+  <!-- PÚBLICO POR MÊS E PÚBLICO TOTAL -->
+  <div class="two-col">
+    <div class="chart-section" style="margin-bottom:0">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Público atendido por mês</div>
+          <div class="section-desc">Total de pessoas atendidas em cada mês</div>
+        </div>
+      </div>
+      <div style="position:relative;height:280px"><canvas id="pubMesChart" role="img" aria-label="Público atendido por mês"></canvas></div>
+    </div>
+    <div class="chart-section" style="margin-bottom:0">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Público total por atividade</div>
+          <div class="section-desc">Pessoas atendidas em cada modalidade — Jan a Abr</div>
+        </div>
+      </div>
+      <div style="position:relative;height:280px"><canvas id="pubAtivChart" role="img" aria-label="Público total por atividade"></canvas></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -366,7 +400,7 @@ const ATIV = [
   {key:'cafe', label:'Café na Faixa',        color:'#059669'},
   {key:'resp', label:'Coletivo Resp',        color:'#d97706'},
   {key:'circ', label:'Circuito de Rua',      color:'#7c3aed'},
-  {key:'det',  label:'DETRAN',               color:'#dc2626'},
+  {key:'det',  label:'DETRAN nos Parques',               color:'#dc2626'},
   {key:'par',  label:'Parques',              color:'#0891b2'},
   {key:'app',  label:'Entrega de APP',       color:'#be185d'},
   {key:'pal',  label:'Palestra em Inst',     color:'#65a30d'},
@@ -633,6 +667,117 @@ document.querySelectorAll('.pill').forEach(b=>{
 renderMainChart();
 renderCards();
 renderAtCharts();
+
+// ─── NOVOS DADOS: ATIVIDADES E PÚBLICO POR MÊS ───────────────────────
+const MESES = ['Jan','Fev','Mar','Abr'];
+const MES_COLORS = ['#2563eb','#059669','#d97706','#d4501a'];
+
+const ATIV_MES = [
+  {key:'bike', label:'Bike em Dia',          color:'#2563eb', acoes:[4,4,13,7],    pub:[482,380,1232,650]},
+  {key:'cafe', label:'Café na Faixa',         color:'#059669', acoes:[3,5,6,11],   pub:[370,515,746,1930]},
+  {key:'circ', label:'Circuito de Rua',       color:'#7c3aed', acoes:[6,4,5,18],   pub:[1,540,620,590]},
+  {key:'resp', label:'Coletivo Resp',         color:'#d97706', acoes:[0,0,2,6],    pub:[0,0,120,735]},
+  {key:'det',  label:'DETRAN nos Parques',     color:'#dc2626', acoes:[3,10,3,2],   pub:[550,20400,750,300]},
+  {key:'app',  label:'Entrega de APP',        color:'#be185d', acoes:[0,0,3,4],    pub:[0,0,145,215]},
+  {key:'pal',  label:'Palestra em Inst',      color:'#65a30d', acoes:[3,3,1,5],    pub:[180,190,25,390]},
+  {key:'pas',  label:'Passeio Ciclístico',    color:'#c2410c', acoes:[0,0,1,0],    pub:[0,0,500,0]},
+  {key:'volta',label:'Volta às Aulas',        color:'#4338ca', acoes:[2,16,0,0],   pub:[400,3804,0,0]},
+  {key:'pneu', label:'Pneu Seguro',           color:'#0891b2', acoes:[10,5,16,13], pub:[851,835,2158,1875]},
+];
+const PUBLICO_MES = [4373, 26744, 6266, 8263];
+const TOTAL_PUB = 45646;
+const TIP2 = {backgroundColor:'rgba(26,26,24,0.95)',titleColor:'#ffffff',bodyColor:'#b8b8ad',borderColor:'rgba(255,255,255,0.12)',borderWidth:1,padding:12,cornerRadius:10};
+
+// Gráfico: atividades por mês (grouped, cada atividade uma cor)
+new Chart(document.getElementById('atMesChart'), {
+  type: 'bar',
+  data: {
+    labels: MESES,
+    datasets: ATIV_MES.map(a => ({
+      label: a.label,
+      data: a.acoes,
+      backgroundColor: a.color + 'bb',
+      hoverBackgroundColor: a.color,
+      borderColor: a.color,
+      borderWidth: 1.5,
+      borderRadius: 4,
+      borderSkipped: false,
+    }))
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { ...TIP2, mode: 'index', intersect: false }
+    },
+    scales: {
+      x: { grid: {display:false}, ticks: {color:'#7a7a70', font:{size:12,weight:'600',family:'Plus Jakarta Sans'}} },
+      y: { grid: {color:'rgba(0,0,0,0.05)'}, ticks: {color:'#7a7a70', font:{size:12,family:'Plus Jakarta Sans'}} }
+    }
+  }
+});
+document.getElementById('atmes-legend').innerHTML = ATIV_MES.map(a =>
+  `<div class="legend-item"><div class="legend-dot" style="background:${a.color}"></div>${a.label}</div>`
+).join('');
+
+// Gráfico: público por mês
+new Chart(document.getElementById('pubMesChart'), {
+  type: 'bar',
+  data: {
+    labels: MESES,
+    datasets: [{
+      data: PUBLICO_MES,
+      backgroundColor: MES_COLORS.map(c => c + '99'),
+      hoverBackgroundColor: MES_COLORS,
+      borderColor: MES_COLORS,
+      borderWidth: 2,
+      borderRadius: 8,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: {display:false},
+      tooltip: { ...TIP2, callbacks: { label: c => `${Number(c.raw).toLocaleString('pt-BR')} pessoas` } }
+    },
+    scales: {
+      x: { grid:{display:false}, ticks:{color:'#7a7a70',font:{size:13,weight:'600',family:'Plus Jakarta Sans'}} },
+      y: { grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#7a7a70',font:{size:12},callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v} }
+    }
+  }
+});
+
+// Gráfico: público total por atividade
+(function(){
+  const sorted = [...ATIV_MES].map(a=>({...a, v:a.pub.reduce((s,x)=>s+x,0)})).sort((a,b)=>b.v-a.v);
+  new Chart(document.getElementById('pubAtivChart'), {
+    type: 'bar',
+    data: {
+      labels: sorted.map(a => a.label),
+      datasets: [{
+        data: sorted.map(a => a.v),
+        backgroundColor: sorted.map(a => a.color + 'bb'),
+        hoverBackgroundColor: sorted.map(a => a.color),
+        borderColor: sorted.map(a => a.color),
+        borderWidth: 2,
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: {display:false},
+        tooltip: { ...TIP2, callbacks: { label: c => `${Number(c.raw).toLocaleString('pt-BR')} pessoas · ${Math.round(c.raw/TOTAL_PUB*100)}%` } }
+      },
+      scales: {
+        x: { grid:{display:false}, ticks:{color:'#7a7a70',font:{size:10,family:'Plus Jakarta Sans'},maxRotation:35,autoSkip:false} },
+        y: { grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#7a7a70',font:{size:12},callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v} }
+      }
+    }
+  });
+})();
 </script>
 </body>
 </html>
