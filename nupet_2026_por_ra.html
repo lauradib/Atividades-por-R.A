@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NUPET 2026 — Atividades por Região Administrativa</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f5f4ef;
+  --bg2: #eeede6;
+  --surface: #ffffff;
+  --surface2: #f9f8f3;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #1a1a18;
+  --muted: #7a7a70;
+  --muted2: #b8b8ad;
+  --font: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Playfair Display', serif;
+}
+
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.5; }
+
+/* ─── LAYOUT ─── */
+.page { max-width: 1400px; margin: 0 auto; padding: 0 40px 80px; }
+
+/* ─── HEADER ─── */
+.header {
+  padding: 48px 0 40px;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  border-bottom: 1.5px solid var(--border2);
+  margin-bottom: 36px;
+}
+.header-left {}
+.eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+.eyebrow::before { content:''; display:inline-block; width:24px; height:2px; background: #d4501a; }
+h1 { font-family: var(--font-display); font-size: 44px; font-weight: 700; line-height: 1.1; color: var(--text); margin-bottom: 6px; }
+.subtitle { color: var(--muted); font-size: 15px; font-weight: 300; }
+.header-right { text-align: right; }
+.total-badge {
+  font-family: var(--font-display); font-size: 64px; font-weight: 700; line-height: 1;
+  color: #d4501a; letter-spacing: -0.02em;
+}
+.total-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; }
+
+/* ─── SUMMARY STRIP ─── */
+.summary-strip {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 0; border: 1.5px solid var(--border2); border-radius: 16px;
+  overflow: hidden; margin-bottom: 40px; background: var(--surface);
+}
+.strip-item {
+  padding: 20px 24px; border-right: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.strip-item:last-child { border-right: none; }
+.strip-item:hover { background: var(--surface2); }
+.strip-k { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 6px; }
+.strip-v { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; }
+.strip-v.accent { color: #d4501a; }
+.strip-s { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+/* ─── CONTROLS ─── */
+.controls {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.ctrl-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.pill-group { display: flex; gap: 4px; flex-wrap: wrap; }
+.pill {
+  padding: 7px 16px; font-family: var(--font); font-size: 12px; font-weight: 500;
+  border: 1.5px solid var(--border2); border-radius: 100px;
+  background: transparent; color: var(--muted); cursor: pointer; transition: all 0.18s;
+}
+.pill:hover { background: var(--bg2); color: var(--text); border-color: var(--border2); }
+.pill.active { background: var(--text); color: #fff; border-color: var(--text); }
+
+.sep { width: 1px; height: 28px; background: var(--border2); margin: 0 6px; }
+
+select {
+  font-family: var(--font); font-size: 12px; font-weight: 500;
+  padding: 7px 14px; border: 1.5px solid var(--border2); border-radius: 100px;
+  background: var(--surface); color: var(--text); cursor: pointer; outline: none;
+  transition: border-color 0.2s;
+}
+select:focus { border-color: var(--text); }
+
+/* ─── MAIN CHART ─── */
+.chart-section { background: var(--surface); border: 1.5px solid var(--border2); border-radius: 20px; padding: 32px; margin-bottom: 28px; }
+.section-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+.section-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.section-desc { font-size: 13px; color: var(--muted); }
+.chart-wrap { position: relative; }
+
+/* ─── RA CARDS GRID ─── */
+.ra-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.ra-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.ra-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: var(--ra-color);
+}
+.ra-card:hover { transform: translateY(-2px); border-color: var(--ra-color); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+.ra-card.selected { border-color: var(--ra-color); background: var(--surface2); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ra-color) 20%, transparent); }
+.ra-card.zeroed { opacity: 0.4; }
+.ra-name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 8px; line-height: 1.3; }
+.ra-total { font-size: 32px; font-weight: 800; line-height: 1; color: var(--ra-color); }
+.ra-sub { font-size: 11px; color: var(--muted2); margin-top: 4px; }
+
+/* ─── DETAIL PANEL ─── */
+.detail-panel {
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: 20px; padding: 32px; margin-bottom: 28px;
+  display: none;
+}
+.detail-panel.open { display: block; animation: slideDown 0.25s ease; }
+@keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+.detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.detail-ra-name { font-family: var(--font-display); font-size: 28px; font-weight: 700; }
+.detail-total { font-size: 48px; font-weight: 800; line-height: 1; }
+.close-btn {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--bg2);
+  border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 18px; color: var(--muted); transition: all 0.2s; font-weight: 300;
+}
+.close-btn:hover { background: var(--text); color: #fff; border-color: var(--text); }
+.ativ-bars { display: flex; flex-direction: column; gap: 10px; }
+.ativ-row { display: flex; align-items: center; gap: 12px; }
+.ativ-label { font-size: 12px; font-weight: 500; width: 160px; flex-shrink: 0; color: var(--text); }
+.ativ-track { flex: 1; height: 10px; background: var(--bg2); border-radius: 100px; overflow: hidden; }
+.ativ-fill { height: 100%; border-radius: 100px; transition: width 0.7s cubic-bezier(.16,1,.3,1); }
+.ativ-count { font-size: 13px; font-weight: 700; min-width: 24px; text-align: right; }
+.ativ-row.zero { opacity: 0.3; }
+
+/* ─── COMPARE CHART ─── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+
+/* ─── LEGEND GRID ─── */
+.legend-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px; margin-top: 20px;
+}
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+/* ─── ACTIVITY COLOR DOTS in strip ─── */
+.at-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+
+@media (max-width: 900px) {
+  .page { padding: 0 20px 60px; }
+  .header { flex-direction: column; gap: 20px; }
+  .summary-strip { grid-template-columns: repeat(3,1fr); }
+  .two-col { grid-template-columns: 1fr; }
+  h1 { font-size: 32px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="eyebrow">Distrito Federal · 2026</div>
+      <h1>Atividades por<br>Região Administrativa</h1>
+      <p class="subtitle">NUPET — Núcleo de Pedestres e Ciclistas · Jan–Abr 2026</p>
+    </div>
+    <div class="header-right">
+      <div class="total-badge" id="anim-total">0</div>
+      <div class="total-label">atividades realizadas</div>
+    </div>
+  </header>
+
+  <!-- SUMMARY STRIP -->
+  <div class="summary-strip">
+    <div class="strip-item">
+      <div class="strip-k">RAs atendidas</div>
+      <div class="strip-v accent">26</div>
+      <div class="strip-s">de 35 regiões</div>
+    </div>
+    <div class="strip-item">
+      <div class="strip-k">RA líder</div>
+      <div class="strip-v" style="font-size:18px;margin-top:4px">Plano Piloto</div>
+      <div class="strip-s">36 atividades</div>
+    </div>
+    <div class="strip-item">
+      <div class="strip-k">2ª colocada</div>
+      <div class="strip-v" style="font-size:18px;margin-top:4px">Paranoá</div>
+      <div class="strip-s">25 atividades</div>
+    </div>
+    <div class="strip-item">
+      <div class="strip-k">Atividade mais frequente</div>
+      <div class="strip-v" style="font-size:15px;margin-top:4px">Palestra em Inst.</div>
+      <div class="strip-s">44 ocorrências</div>
+    </div>
+    <div class="strip-item">
+      <div class="strip-k">Sem atividades</div>
+      <div class="strip-v accent">9</div>
+      <div class="strip-s">regiões</div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <span class="ctrl-label">Ordenar por</span>
+    <div class="pill-group">
+      <button class="pill active" onclick="setSort('total')">Total</button>
+      <button class="pill" onclick="setSort('alpha')">A–Z</button>
+    </div>
+    <div class="sep"></div>
+    <span class="ctrl-label">Mostrar</span>
+    <div class="pill-group">
+      <button class="pill active" onclick="setFilter('all')">Todas</button>
+      <button class="pill" onclick="setFilter('active')">Com atividade</button>
+      <button class="pill" onclick="setFilter('top10')">Top 10</button>
+    </div>
+    <div class="sep"></div>
+    <span class="ctrl-label">Atividade</span>
+    <select id="atFilter" onchange="applyFilters()">
+      <option value="total">Todas as atividades</option>
+      <option value="bike">Bike em Dia</option>
+      <option value="cafe">Café na Faixa</option>
+      <option value="resp">Coletivo Resp</option>
+      <option value="circ">Circuito de Rua</option>
+      <option value="det">DETRAN</option>
+      <option value="par">Parques</option>
+      <option value="app">Entrega de APP</option>
+      <option value="pal">Palestra em Inst</option>
+      <option value="pas">Passeio Ciclístico</option>
+      <option value="volta">Volta às Aulas</option>
+    </select>
+  </div>
+
+  <!-- MAIN COLUMN CHART -->
+  <div class="chart-section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Atividades por Região Administrativa</div>
+        <div class="section-desc" id="chart-desc">Cada coluna representa uma RA — clique para ver o detalhamento completo</div>
+      </div>
+    </div>
+    <div class="chart-wrap" id="main-chart-wrap" style="height:380px">
+      <canvas id="mainChart" role="img" aria-label="Gráfico de colunas com atividades por Região Administrativa"></canvas>
+    </div>
+    <div class="legend-grid" id="main-legend"></div>
+  </div>
+
+  <!-- DETAIL PANEL -->
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-header">
+      <div>
+        <div class="section-desc" id="detail-eyebrow">Região Administrativa</div>
+        <div class="detail-ra-name" id="detail-name">—</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:20px">
+        <div>
+          <div class="section-desc" style="text-align:right">Total</div>
+          <div class="detail-total" id="detail-total" style="color:#d4501a">—</div>
+        </div>
+        <button class="close-btn" onclick="closeDetail()">×</button>
+      </div>
+    </div>
+    <div class="ativ-bars" id="detail-bars"></div>
+  </div>
+
+  <!-- RA CARDS -->
+  <div class="chart-section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Cards por Região Administrativa</div>
+        <div class="section-desc">Clique em qualquer cartão para ver o detalhamento das atividades</div>
+      </div>
+    </div>
+    <div class="ra-grid" id="ra-grid"></div>
+  </div>
+
+  <!-- TWO CHARTS -->
+  <div class="two-col">
+    <div class="chart-section" style="margin-bottom:0">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Volume por tipo de atividade</div>
+          <div class="section-desc">Ocorrências totais de cada modalidade</div>
+        </div>
+      </div>
+      <div style="position:relative;height:280px"><canvas id="atChart" role="img" aria-label="Volume por tipo de atividade"></canvas></div>
+    </div>
+    <div class="chart-section" style="margin-bottom:0">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Proporção das atividades</div>
+          <div class="section-desc">Participação % de cada tipo no total</div>
+        </div>
+      </div>
+      <div style="position:relative;height:220px"><canvas id="doughChart" role="img" aria-label="Proporção das atividades"></canvas></div>
+      <div class="legend-grid" id="dough-legend" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────
+const ALL_RA = [
+  {ra:"Plano Piloto",    bike:2,cafe:2,col:0,resp:7,circ:12,det:0,par:2,app:0,pal:11,pas:0,pneu:0,volta:0,total:36},
+  {ra:"Paranoá",         bike:10,cafe:2,col:0,resp:1,circ:7,det:0,par:1,app:1,pal:2,pas:0,pneu:0,volta:1,total:25},
+  {ra:"Taguatinga",      bike:4,cafe:1,col:0,resp:2,circ:1,det:0,par:1,app:3,pal:3,pas:0,pneu:0,volta:0,total:15},
+  {ra:"Ceilândia",       bike:1,cafe:0,col:0,resp:0,circ:1,det:0,par:3,app:0,pal:5,pas:0,pneu:0,volta:0,total:10},
+  {ra:"Guará",           bike:1,cafe:4,col:0,resp:0,circ:3,det:0,par:0,app:0,pal:1,pas:0,pneu:0,volta:0,total:9},
+  {ra:"Itapoã",          bike:2,cafe:0,col:0,resp:0,circ:1,det:0,par:0,app:0,pal:5,pas:1,pneu:0,volta:0,total:9},
+  {ra:"Samambaia",       bike:1,cafe:2,col:0,resp:0,circ:1,det:4,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:8},
+  {ra:"Santa Maria",     bike:1,cafe:0,col:0,resp:2,circ:4,det:0,par:0,app:0,pal:1,pas:0,pneu:0,volta:0,total:8},
+  {ra:"Planaltina",      bike:0,cafe:1,col:0,resp:0,circ:1,det:1,par:2,app:0,pal:2,pas:0,pneu:0,volta:0,total:7},
+  {ra:"SCIA/Estrutural", bike:2,cafe:0,col:0,resp:4,circ:0,det:1,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:7},
+  {ra:"Águas Claras",    bike:1,cafe:0,col:0,resp:0,circ:1,det:0,par:1,app:0,pal:0,pas:1,pneu:0,volta:2,total:6},
+  {ra:"Sobradinho",      bike:1,cafe:0,col:0,resp:0,circ:1,det:4,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:6},
+  {ra:"Cruzeiro",        bike:0,cafe:2,col:0,resp:0,circ:3,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:5},
+  {ra:"Gama",            bike:3,cafe:0,col:0,resp:0,circ:0,det:1,par:0,app:0,pal:1,pas:0,pneu:0,volta:0,total:5},
+  {ra:"Recanto das Emas",bike:1,cafe:0,col:0,resp:0,circ:1,det:2,par:0,app:0,pal:1,pas:0,pneu:0,volta:0,total:5},
+  {ra:"SIA",             bike:0,cafe:4,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:4},
+  {ra:"Candangolândia",  bike:0,cafe:3,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:1,pas:0,pneu:0,volta:0,total:4},
+  {ra:"São Sebastião",   bike:2,cafe:0,col:0,resp:1,circ:1,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:4},
+  {ra:"Riacho Fundo II", bike:1,cafe:1,col:0,resp:0,circ:0,det:2,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:4},
+  {ra:"Lago Norte",      bike:2,cafe:0,col:0,resp:0,circ:0,det:0,par:1,app:0,pal:0,pas:0,pneu:0,volta:0,total:3},
+  {ra:"Sudoeste/Noroeste",bike:2,cafe:0,col:0,resp:1,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:3},
+  {ra:"Vicente Pires",   bike:0,cafe:0,col:0,resp:1,circ:2,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:3},
+  {ra:"Brazlândia",      bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:2,app:0,pal:0,pas:0,pneu:0,volta:0,total:2},
+  {ra:"Jardim Botânico", bike:0,cafe:0,col:0,resp:0,circ:1,det:0,par:0,app:0,pal:0,pas:1,pneu:0,volta:0,total:2},
+  {ra:"Lago Sul",        bike:0,cafe:1,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:1},
+  {ra:"N. Bandeirante",  bike:0,cafe:1,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:1},
+  {ra:"Varjão",          bike:0,cafe:1,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:1},
+  {ra:"Arapoanga",       bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:1,pas:0,pneu:0,volta:0,total:1},
+  // zeros
+  {ra:"Água Quente",     bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:0},
+  {ra:"Arniqueira",      bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:0},
+  {ra:"Fercal",          bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:0},
+  {ra:"Park Way",        bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:0},
+  {ra:"Riacho Fundo",    bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:0},
+  {ra:"Sobradinho II",   bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:0},
+  {ra:"Sol Nasc/Por do Sol",bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:0},
+];
+
+const ATIV = [
+  {key:'bike', label:'Bike em Dia',         color:'#2563eb'},
+  {key:'cafe', label:'Café na Faixa',        color:'#059669'},
+  {key:'resp', label:'Coletivo Resp',        color:'#d97706'},
+  {key:'circ', label:'Circuito de Rua',      color:'#7c3aed'},
+  {key:'det',  label:'DETRAN',               color:'#dc2626'},
+  {key:'par',  label:'Parques',              color:'#0891b2'},
+  {key:'app',  label:'Entrega de APP',       color:'#be185d'},
+  {key:'pal',  label:'Palestra em Inst',     color:'#65a30d'},
+  {key:'pas',  label:'Passeio Ciclístico',   color:'#c2410c'},
+  {key:'volta',label:'Volta às Aulas',       color:'#4338ca'},
+];
+
+// Distinct colors per RA (28 active)
+const RA_COLORS = [
+  '#d4501a','#2563eb','#059669','#7c3aed','#dc2626',
+  '#0891b2','#be185d','#65a30d','#c2410c','#4338ca',
+  '#0369a1','#b45309','#6d28d9','#047857','#9f1239',
+  '#1d4ed8','#92400e','#0f766e','#7e22ce','#b91c1c',
+  '#155e75','#854d0e','#4c1d95','#065f46','#831843',
+  '#1e3a8a','#78350f','#134e4a',
+];
+
+const TOTAL = 194;
+let currentSort = 'total';
+let currentFilter = 'all';
+let currentAt = 'total';
+let selectedRA = null;
+let mainChart;
+
+// ─── COUNTER ANIMATION ───────────────────────────────────────────────
+(function(){
+  const el = document.getElementById('anim-total');
+  let v=0, dur=1400, step=16, inc=TOTAL/(dur/step);
+  const t=setInterval(()=>{v+=inc;el.textContent=Math.min(Math.round(v),TOTAL);if(v>=TOTAL)clearInterval(t);},step);
+})();
+
+// ─── HELPERS ─────────────────────────────────────────────────────────
+function getRAColor(ra) {
+  const active = ALL_RA.filter(r=>r.total>0).sort((a,b)=>b.total-a.total);
+  const i = active.findIndex(r=>r.ra===ra);
+  return i>=0 ? RA_COLORS[i % RA_COLORS.length] : '#cccccc';
+}
+
+function getDisplayData() {
+  let data = [...ALL_RA];
+  if(currentFilter==='active') data = data.filter(r=>r.total>0);
+  if(currentFilter==='top10') data = [...ALL_RA].sort((a,b)=>b.total-a.total).slice(0,10);
+  if(currentSort==='total') data.sort((a,b)=>b.total-a.total);
+  if(currentSort==='alpha') data.sort((a,b)=>a.ra.localeCompare(b.ra));
+  return data;
+}
+
+// ─── MAIN CHART ───────────────────────────────────────────────────────
+function renderMainChart() {
+  const data = getDisplayData();
+  const key = currentAt;
+  const values = data.map(r=> key==='total' ? r.total : (r[key]||0));
+  const colors = data.map(r=>getRAColor(r.ra));
+
+  const desc = key==='total'
+    ? `Exibindo ${data.length} regiões — total de atividades por RA`
+    : `Filtrando por: ${ATIV.find(a=>a.key===key)?.label} — por RA`;
+  document.getElementById('chart-desc').textContent = desc;
+
+  if(mainChart) mainChart.destroy();
+  const h = Math.max(340, 340);
+  document.getElementById('main-chart-wrap').style.height = h+'px';
+
+  mainChart = new Chart(document.getElementById('mainChart'), {
+    type:'bar',
+    data:{
+      labels: data.map(r=>r.ra),
+      datasets:[{
+        data: values,
+        backgroundColor: colors.map(c=>c+'cc'),
+        hoverBackgroundColor: colors,
+        borderColor: colors,
+        borderWidth: 2,
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      onClick:(evt,els)=>{
+        if(els.length>0) { openDetail(data[els[0].index].ra); }
+      },
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            title: ctx => ctx[0].label,
+            label: ctx => {
+              if(key==='total') {
+                const r = data[ctx.dataIndex];
+                const types = ATIV.filter(a=>r[a.key]>0).map(a=>`${a.label}: ${r[a.key]}`);
+                return [` Total: ${ctx.raw} atividades`, ...types.map(t=>`  · ${t}`)];
+              }
+              return ` ${ATIV.find(a=>a.key===key)?.label}: ${ctx.raw}`;
+            }
+          },
+          backgroundColor:'rgba(26,26,24,0.95)',
+          titleColor:'#ffffff',
+          bodyColor:'#b8b8ad',
+          borderColor:'rgba(255,255,255,0.12)',
+          borderWidth:1,
+          padding:12,
+          cornerRadius:10,
+        }
+      },
+      scales:{
+        x:{
+          grid:{display:false},
+          ticks:{
+            color:'#7a7a70', font:{size:11, family:'Plus Jakarta Sans'},
+            maxRotation:45, autoSkip:false,
+            callback: function(val,i) {
+              const name = data[i].ra;
+              return name.length>12 ? name.slice(0,11)+'…' : name;
+            }
+          },
+          border:{color:'rgba(0,0,0,0.1)'}
+        },
+        y:{
+          grid:{color:'rgba(0,0,0,0.05)', lineWidth:1},
+          ticks:{color:'#7a7a70', font:{size:12, family:'Plus Jakarta Sans'}},
+          border:{color:'rgba(0,0,0,0.1)'}
+        }
+      }
+    }
+  });
+
+  // Legend
+  const leg = document.getElementById('main-legend');
+  leg.innerHTML = data.filter(r=>key==='total'?r.total>0:r[key]>0).map(r=>{
+    const c = getRAColor(r.ra);
+    return `<div class="legend-item"><div class="legend-dot" style="background:${c}"></div>${r.ra}</div>`;
+  }).join('');
+}
+
+// ─── RA CARDS ────────────────────────────────────────────────────────
+function renderCards() {
+  const data = getDisplayData();
+  const key = currentAt;
+  const grid = document.getElementById('ra-grid');
+  grid.innerHTML = data.map(r=>{
+    const val = key==='total' ? r.total : (r[key]||0);
+    const color = getRAColor(r.ra);
+    const types = ATIV.filter(a=>r[a.key]>0).length;
+    const sel = selectedRA===r.ra ? 'selected' : '';
+    const zeroed = val===0 ? 'zeroed' : '';
+    return `<div class="ra-card ${sel} ${zeroed}" style="--ra-color:${color}" onclick="openDetail('${r.ra}')">
+      <div class="ra-name">${r.ra}</div>
+      <div class="ra-total">${val}</div>
+      <div class="ra-sub">${types} tipo${types!==1?'s':''} de atividade</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── DETAIL PANEL ────────────────────────────────────────────────────
+function openDetail(raName) {
+  selectedRA = raName;
+  const r = ALL_RA.find(d=>d.ra===raName);
+  if(!r) return;
+  const color = getRAColor(raName);
+  const panel = document.getElementById('detail-panel');
+  document.getElementById('detail-name').textContent = raName;
+  document.getElementById('detail-name').style.color = color;
+  document.getElementById('detail-total').textContent = r.total;
+  document.getElementById('detail-eyebrow').textContent = 'Detalhamento — Região Administrativa';
+  const maxVal = Math.max(...ATIV.map(a=>r[a.key]));
+  document.getElementById('detail-bars').innerHTML = ATIV.map(a=>{
+    const v = r[a.key];
+    const pct = maxVal>0 ? (v/maxVal*100) : 0;
+    return `<div class="ativ-row ${v===0?'zero':''}">
+      <div class="ativ-label">${a.label}</div>
+      <div class="ativ-track"><div class="ativ-fill" style="width:0%;background:${a.color}" data-pct="${pct}"></div></div>
+      <div class="ativ-count" style="color:${v>0?a.color:'#b8b8ad'}">${v}</div>
+    </div>`;
+  }).join('');
+  panel.classList.add('open');
+  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.querySelectorAll('.ativ-fill').forEach(b=>b.style.width=b.dataset.pct+'%');
+  }));
+  renderCards(); // update selected state
+}
+
+function closeDetail() {
+  selectedRA = null;
+  document.getElementById('detail-panel').classList.remove('open');
+  renderCards();
+}
+
+// ─── ACTIVITY CHARTS ─────────────────────────────────────────────────
+function renderAtCharts() {
+  const atTotals = ATIV.map(a=>({...a, v:ALL_RA.reduce((s,r)=>s+r[a.key],0)})).sort((a,b)=>b.v-a.v);
+
+  new Chart(document.getElementById('atChart'),{
+    type:'bar',
+    data:{
+      labels:atTotals.map(a=>a.label),
+      datasets:[{
+        data:atTotals.map(a=>a.v),
+        backgroundColor:atTotals.map(a=>a.color+'bb'),
+        hoverBackgroundColor:atTotals.map(a=>a.color),
+        borderColor:atTotals.map(a=>a.color),
+        borderWidth:2,
+        borderRadius:5, borderSkipped:false,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{
+        callbacks:{label:c=>`${c.raw} ocorrências · ${Math.round(c.raw/TOTAL*100)}%`},
+        backgroundColor:'rgba(26,26,24,0.95)',bodyColor:'#b8b8ad',titleColor:'#fff',cornerRadius:10,padding:10,
+      }},
+      scales:{
+        x:{grid:{display:false},ticks:{color:'#7a7a70',font:{size:10,family:'Plus Jakarta Sans'},maxRotation:40,autoSkip:false}},
+        y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#7a7a70',font:{size:12}}}
+      }
+    }
+  });
+
+  new Chart(document.getElementById('doughChart'),{
+    type:'doughnut',
+    data:{
+      labels:atTotals.map(a=>a.label),
+      datasets:[{data:atTotals.map(a=>a.v),backgroundColor:atTotals.map(a=>a.color),borderWidth:0,hoverOffset:6}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw} (${Math.round(c.raw/TOTAL*100)}%)`},backgroundColor:'rgba(26,26,24,0.95)',titleColor:'#fff',bodyColor:'#b8b8ad',cornerRadius:10,padding:10}}
+    }
+  });
+
+  document.getElementById('dough-legend').innerHTML = atTotals.map(a=>
+    `<div class="legend-item"><div class="legend-dot" style="background:${a.color}"></div>${a.label} — ${a.v}</div>`
+  ).join('');
+}
+
+// ─── CONTROLS ────────────────────────────────────────────────────────
+function setSort(s) {
+  currentSort = s;
+  document.querySelectorAll('.pill-group:nth-child(2) .pill').forEach((b,i)=>b.classList.toggle('active',['total','alpha'][i]===s));
+  applyFilters();
+}
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.pill-group:nth-child(4) .pill').forEach((b,i)=>b.classList.toggle('active',['all','active','top10'][i]===f));
+  applyFilters();
+}
+function applyFilters() {
+  currentAt = document.getElementById('atFilter').value;
+  renderMainChart();
+  renderCards();
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────
+// Fix pill groups selector by index
+document.querySelectorAll('.pill').forEach(b=>{
+  b.addEventListener('click', function(){
+    const group = this.closest('.pill-group');
+    group.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+renderMainChart();
+renderCards();
+renderAtCharts();
+</script>
+</body>
+</html>
