@@ -241,13 +241,14 @@ select:focus { border-color: var(--text); }
       <option value="total">Todas as atividades</option>
       <option value="bike">Bike em Dia</option>
       <option value="cafe">Café na Faixa</option>
-      <option value="resp">Coletivo Resp</option>
+      <option value="resp">Coletivo Responsável</option>
       <option value="circ">Circuito de Rua</option>
       <option value="det">DETRAN nos Parques</option>
       <option value="par">Parques</option>
-      <option value="app">Entrega de APP</option>
-      <option value="pal">Palestra em Inst</option>
+      <option value="app">Entregadores de APP</option>
+      <option value="pal">Palestra em Inst.</option>
       <option value="pas">Passeio Ciclístico</option>
+      <option value="pneu">Pneu Seguro</option>
       <option value="volta">Volta às Aulas</option>
     </select>
   </div>
@@ -357,55 +358,60 @@ select:focus { border-color: var(--text); }
 <script>
 // ─── DATA ───────────────────────────────────────────────────────────
 const ALL_RA = [
-  {ra:"Plano Piloto",    bike:2,cafe:2,col:0,resp:7,circ:12,det:0,par:2,app:0,pal:11,pas:0,pneu:0,volta:0,total:36},
-  {ra:"Paranoá",         bike:10,cafe:2,col:0,resp:1,circ:7,det:0,par:1,app:1,pal:2,pas:0,pneu:0,volta:1,total:25},
-  {ra:"Taguatinga",      bike:4,cafe:1,col:0,resp:2,circ:1,det:0,par:1,app:3,pal:3,pas:0,pneu:0,volta:0,total:15},
-  {ra:"Ceilândia",       bike:1,cafe:0,col:0,resp:0,circ:1,det:0,par:3,app:0,pal:5,pas:0,pneu:0,volta:0,total:10},
-  {ra:"Guará",           bike:1,cafe:4,col:0,resp:0,circ:3,det:0,par:0,app:0,pal:1,pas:0,pneu:0,volta:0,total:9},
-  {ra:"Itapoã",          bike:2,cafe:0,col:0,resp:0,circ:1,det:0,par:0,app:0,pal:5,pas:1,pneu:0,volta:0,total:9},
-  {ra:"Samambaia",       bike:1,cafe:2,col:0,resp:0,circ:1,det:4,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:8},
-  {ra:"Santa Maria",     bike:1,cafe:0,col:0,resp:2,circ:4,det:0,par:0,app:0,pal:1,pas:0,pneu:0,volta:0,total:8},
-  {ra:"Planaltina",      bike:0,cafe:1,col:0,resp:0,circ:1,det:1,par:2,app:0,pal:2,pas:0,pneu:0,volta:0,total:7},
-  {ra:"SCIA/Estrutural", bike:2,cafe:0,col:0,resp:4,circ:0,det:1,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:7},
-  {ra:"Águas Claras",    bike:1,cafe:0,col:0,resp:0,circ:1,det:0,par:1,app:0,pal:0,pas:1,pneu:0,volta:2,total:6},
-  {ra:"Sobradinho",      bike:1,cafe:0,col:0,resp:0,circ:1,det:4,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:6},
-  {ra:"Cruzeiro",        bike:0,cafe:2,col:0,resp:0,circ:3,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:5},
-  {ra:"Gama",            bike:3,cafe:0,col:0,resp:0,circ:0,det:1,par:0,app:0,pal:1,pas:0,pneu:0,volta:0,total:5},
-  {ra:"Recanto das Emas",bike:1,cafe:0,col:0,resp:0,circ:1,det:2,par:0,app:0,pal:1,pas:0,pneu:0,volta:0,total:5},
-  {ra:"SIA",             bike:0,cafe:4,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:4},
-  {ra:"Candangolândia",  bike:0,cafe:3,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:1,pas:0,pneu:0,volta:0,total:4},
-  {ra:"São Sebastião",   bike:2,cafe:0,col:0,resp:1,circ:1,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:4},
-  {ra:"Riacho Fundo II", bike:1,cafe:1,col:0,resp:0,circ:0,det:2,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:4},
-  {ra:"Lago Norte",      bike:2,cafe:0,col:0,resp:0,circ:0,det:0,par:1,app:0,pal:0,pas:0,pneu:0,volta:0,total:3},
-  {ra:"Sudoeste/Noroeste",bike:2,cafe:0,col:0,resp:1,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:3},
-  {ra:"Vicente Pires",   bike:0,cafe:0,col:0,resp:1,circ:2,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:3},
-  {ra:"Brazlândia",      bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:2,app:0,pal:0,pas:0,pneu:0,volta:0,total:2},
-  {ra:"Jardim Botânico", bike:0,cafe:0,col:0,resp:0,circ:1,det:0,par:0,app:0,pal:0,pas:1,pneu:0,volta:0,total:2},
-  {ra:"Lago Sul",        bike:0,cafe:1,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:1},
-  {ra:"N. Bandeirante",  bike:0,cafe:1,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:1},
-  {ra:"Varjão",          bike:0,cafe:1,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:1},
-  {ra:"Arapoanga",       bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:1,pas:0,pneu:0,volta:0,total:1},
+  // Fonte: Tabela oficial NUPET 2026 — verificada coluna por coluna, total=194 ✓
+  // bike=Bike em Dia | cafe=Café na Faixa | resp=Coletivo Resp | circ=Circuito de Rua
+  // det=DETRAN Parques | app=Entreg APP | pal=Palestra Inst | pas=Passeio Ciclístico
+  // pneu=Pneu Seguro | volta=Volta às Aulas
+  {ra:"Águas Claras",        bike:0,  cafe:0,  resp:1,  circ:1,  det:0,  par:0, app:1, pal:0,  pas:0, pneu:1,  volta:2, total:6},
+  {ra:"Arapoanga",           bike:1,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:0,  volta:0, total:1},
+  {ra:"Brazlândia",          bike:0,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:2,  volta:0, total:2},
+  {ra:"Candangolândia",      bike:0,  cafe:3,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:1,  volta:0, total:4},
+  {ra:"Ceilândia",           bike:0,  cafe:1,  resp:0,  circ:1,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:3,  volta:5, total:10},
+  {ra:"Cruzeiro",            bike:0,  cafe:0,  resp:2,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:3,  volta:0, total:5},
+  {ra:"Gama",                bike:3,  cafe:1,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:1,  volta:0, total:5},
+  {ra:"Guará",               bike:1,  cafe:4,  resp:0,  circ:3,  det:0,  par:0, app:0, pal:1,  pas:0, pneu:0,  volta:0, total:9},
+  {ra:"Itapoã",              bike:0,  cafe:2,  resp:1,  circ:5,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:1,  volta:0, total:9},
+  {ra:"Jardim Botânico",     bike:0,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:1, pal:0,  pas:0, pneu:1,  volta:0, total:2},
+  {ra:"Lago Norte",          bike:0,  cafe:0,  resp:0,  circ:0,  det:2,  par:0, app:0, pal:0,  pas:0, pneu:1,  volta:0, total:3},
+  {ra:"Lago Sul",            bike:0,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:1,  volta:0, total:1},
+  {ra:"N. Bandeirante",      bike:0,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:1,  volta:0, total:1},
+  {ra:"Paranoá",             bike:10, cafe:2,  resp:1,  circ:7,  det:0,  par:0, app:1, pal:0,  pas:1, pneu:1,  volta:2, total:25},
+  {ra:"Planaltina",          bike:1,  cafe:0,  resp:1,  circ:1,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:2,  volta:2, total:7},
+  {ra:"Plano Piloto",        bike:2,  cafe:2,  resp:0,  circ:7,  det:12, par:0, app:0, pal:2,  pas:0, pneu:11, volta:0, total:36},
+  {ra:"Recanto das Emas",    bike:1,  cafe:1,  resp:0,  circ:2,  det:0,  par:0, app:1, pal:0,  pas:0, pneu:0,  volta:0, total:5},
+  {ra:"Riacho Fundo II",     bike:0,  cafe:0,  resp:0,  circ:1,  det:1,  par:0, app:0, pal:0,  pas:0, pneu:2,  volta:0, total:4},
+  {ra:"Samambaia",           bike:0,  cafe:1,  resp:0,  circ:2,  det:1,  par:0, app:0, pal:0,  pas:0, pneu:0,  volta:4, total:8},
+  {ra:"Santa Maria",         bike:0,  cafe:1,  resp:0,  circ:2,  det:0,  par:0, app:0, pal:4,  pas:0, pneu:1,  volta:0, total:8},
+  {ra:"S. Sebastião",        bike:2,  cafe:0,  resp:1,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:1,  volta:0, total:4},
+  {ra:"SCIA/Estrutural",     bike:2,  cafe:4,  resp:0,  circ:1,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:0,  volta:0, total:7},
+  {ra:"SIA",                 bike:0,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:4,  pas:0, pneu:0,  volta:0, total:4},
+  {ra:"Sobradinho",          bike:0,  cafe:1,  resp:1,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:4,  volta:0, total:6},
+  {ra:"Sudoeste/Noroeste",   bike:0,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:2, pal:0,  pas:0, pneu:1,  volta:0, total:3},
+  {ra:"Taguatinga",          bike:4,  cafe:1,  resp:0,  circ:0,  det:2,  par:0, app:1, pal:1,  pas:0, pneu:3,  volta:3, total:15},
+  {ra:"Varjão",              bike:0,  cafe:1,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:0,  volta:0, total:1},
+  {ra:"Vicente Pires",       bike:1,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:2,  volta:0, total:3},
   // zeros
-  {ra:"Água Quente",     bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:0},
-  {ra:"Arniqueira",      bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:0},
-  {ra:"Fercal",          bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:0},
-  {ra:"Park Way",        bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:0},
-  {ra:"Riacho Fundo",    bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:0},
-  {ra:"Sobradinho II",   bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:0},
-  {ra:"Sol Nasc/Por do Sol",bike:0,cafe:0,col:0,resp:0,circ:0,det:0,par:0,app:0,pal:0,pas:0,pneu:0,volta:0,total:0},
+  {ra:"Água Quente",         bike:0,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:0,  volta:0, total:0},
+  {ra:"Arniqueira",          bike:0,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:0,  volta:0, total:0},
+  {ra:"Fercal",              bike:0,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:0,  volta:0, total:0},
+  {ra:"Park Way",            bike:0,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:0,  volta:0, total:0},
+  {ra:"Riacho Fundo",        bike:0,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:0,  volta:0, total:0},
+  {ra:"Sobradinho II",       bike:0,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:0,  volta:0, total:0},
+  {ra:"Sol Nasc/Por do Sol", bike:0,  cafe:0,  resp:0,  circ:0,  det:0,  par:0, app:0, pal:0,  pas:0, pneu:0,  volta:0, total:0},
 ];
 
 const ATIV = [
-  {key:'bike', label:'Bike em Dia',         color:'#2563eb'},
-  {key:'cafe', label:'Café na Faixa',        color:'#059669'},
-  {key:'resp', label:'Coletivo Resp',        color:'#d97706'},
-  {key:'circ', label:'Circuito de Rua',      color:'#7c3aed'},
-  {key:'det',  label:'DETRAN nos Parques',               color:'#dc2626'},
-  {key:'par',  label:'Parques',              color:'#0891b2'},
-  {key:'app',  label:'Entrega de APP',       color:'#be185d'},
-  {key:'pal',  label:'Palestra em Inst',     color:'#65a30d'},
-  {key:'pas',  label:'Passeio Ciclístico',   color:'#c2410c'},
-  {key:'volta',label:'Volta às Aulas',       color:'#4338ca'},
+  {key:'bike', label:'Bike em Dia',           color:'#2563eb'},
+  {key:'cafe', label:'Café na Faixa',          color:'#059669'},
+  {key:'resp', label:'Coletivo Responsável',   color:'#d97706'},
+  {key:'circ', label:'Circuito de Rua',        color:'#7c3aed'},
+  {key:'det',  label:'DETRAN nos Parques',     color:'#dc2626'},
+  {key:'par',  label:'Parques',                color:'#0891b2'},
+  {key:'app',  label:'Entregadores de APP',    color:'#be185d'},
+  {key:'pal',  label:'Palestra em Inst.',      color:'#65a30d'},
+  {key:'pas',  label:'Passeio Ciclístico',     color:'#c2410c'},
+  {key:'pneu', label:'Pneu Seguro',            color:'#0369a1'},
+  {key:'volta',label:'Volta às Aulas',         color:'#4338ca'},
 ];
 
 // Distinct colors per RA (28 active)
